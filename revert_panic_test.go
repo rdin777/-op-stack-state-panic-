@@ -1,25 +1,3 @@
-root@138245:/home/as/base_panic_poc# cat /home/as/base_final_package/base_panic_log.txt | head -n 20
-=== RUN   TestOpStackStatePanic
---- FAIL: TestOpStackStatePanic (0.00s)
-panic: runtime error: invalid memory address or nil pointer dereference [recovered]
-        panic: runtime error: invalid memory address or nil pointer dereference
-[signal SIGSEGV: segmentation violation code=0x1 addr=0x48 pc=0x6eee2d]
-
-goroutine 7 [running]:
-testing.tRunner.func1.2({0x76d120, 0xb7edb0})
-        /root/go/pkg/mod/golang.org/toolchain@v0.0.1-go1.24.0.linux-amd64/src/testing/testing.go:1734 +0x21c
-testing.tRunner.func1()
-        /root/go/pkg/mod/golang.org/toolchain@v0.0.1-go1.24.0.linux-amd64/src/testing/testing.go:1737 +0x35e
-panic({0x76d120?, 0xb7edb0?})
-        /root/go/pkg/mod/golang.org/toolchain@v0.0.1-go1.24.0.linux-amd64/src/runtime/panic.go:787 +0x132
-github.com/ethereum/go-ethereum/core/state.(*stateObject).setNonce(...)
-        /home/as/op-geth/core/state/state_object.go:570
-github.com/ethereum/go-ethereum/core/state.nonceChange.revert(...)
-        /home/as/op-geth/core/state/journal.go:369
-github.com/ethereum/go-ethereum/core/state.(*journal).revert(0xc000033f00, 0xc000016c00, 0x0)
-        /home/as/op-geth/core/state/journal.go:113 +0x77
-github.com/ethereum/go-ethereum/core/state.(*journal).revertToSnapshot(0xc000033f00, 0x0?, 0xefbeadde?)
-root@138245:/home/as/base_panic_poc# cat /home/as/base_final_package/op_stack_revert_panic_test.go
 package state
 
 import (
@@ -32,13 +10,13 @@ import (
 )
 
 func TestOpStackStatePanic(t *testing.T) {
-        // 1. Creating a database in memory
+        // 1. Создаем базу в памяти
         rawDB := rawdb.NewMemoryDatabase()
 
-        // 2. Initialize TrieDB (this is what the stack trace required)
+        // 2. Инициализируем TrieDB (это то, что требовал стэк-трейс)
         tdb := triedb.NewDatabase(rawDB, nil)
 
-        // 3. Now let's create a database for StateDB.
+        // 3. Теперь создаем Database для StateDB
         db := NewDatabase(tdb, nil)
         sdb, _ := New(common.Hash{}, db)
 
@@ -54,7 +32,7 @@ func TestOpStackStatePanic(t *testing.T) {
                 sdb.CreateAccount(addr)
                 sdb.SelfDestruct(addr)
 
-                // This is where we look for the real bug.
+                // Вот здесь мы ищем настоящий баг
                 sdb.RevertToSnapshot(snap)
 
                 if sdb.GetNonce(addr) != 0 {
@@ -62,5 +40,4 @@ func TestOpStackStatePanic(t *testing.T) {
                 }
         }
 }
-root@138245:/home/as/base_panic_poc#
 
