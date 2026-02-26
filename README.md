@@ -1,5 +1,12 @@
 # -op-stack-state-panic-
 Proof of Concept for a Nil Pointer Dereference vulnerability in Optimism-Geth (op-geth) state management, leading to node panic (DoS).
+
+### 📝 Disclosure Status
+* **Platform:** HackerOne
+* **Program:** Coinbase (Optimism/op-geth)
+* **Status:** Duplicate (Report #3509907)
+* **Note:** This vulnerability was discovered independently. Although it was previously reported by another researcher, this repository documents my unique approach to identifying the Nil Pointer Dereference in StateDB and providing a fix.
+* 
 Markdown
 # Vulnerability Research: Node Panic in Optimism-Geth (op-geth)
 
